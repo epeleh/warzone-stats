@@ -1,4 +1,4 @@
-/* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/naming-convention */
 import { assert } from 'console';
 import { trimWhitespace } from './utilities/util';
 import TaskRepeater from './utilities/task-repeater';

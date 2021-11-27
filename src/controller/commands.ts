@@ -40,7 +40,7 @@ export async function postStats(message: Message, args: CommandArgs) {
   });
 }
 
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function postPlayers(message: Message, args: CommandArgs) {
   // fetch guild id
   const guildId = message.guild.id;
@@ -96,7 +96,7 @@ export async function unregisterPlayer(message: Message, args: CommandArgs) {
   }
 }
 
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function postSingleStats(message: Message, args: CommandArgs) {
   await message.reply('This command has been merged with `!wz stats`. Please use that instead.');
 }

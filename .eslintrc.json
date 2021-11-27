@@ -4,10 +4,12 @@
     "es2021": true
   },
   "extends": [
-    "airbnb-base"
+    "airbnb-base",
+    "airbnb-typescript/base"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
+    "project": "tsconfig.json",
     "ecmaVersion": 13,
     "sourceType": "module"
   },
@@ -29,9 +31,9 @@
     "no-restricted-syntax": "off",
     "object-curly-newline": "off",
     "no-await-in-loop": "off",
-    "no-return-await": "off",
+    "@typescript-eslint/return-await": "off",
     "prefer-promise-reject-errors": "off",
-    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": "off",
     "import/prefer-default-export": "off",
     "import/extensions": [
       "error",
