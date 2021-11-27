@@ -34,7 +34,7 @@ export async function postStats(message: Message, args: CommandArgs) {
     }
   }
 
-  if (message.author.id === message.client.user.id) {
+  if (!!players.length && message.author.id === message.client.user.id) {
     await Promise.all([
       message.guild.members.fetch({ user: players.map(({ memberId }) => memberId) }),
       message.guild.roles.fetch(),
