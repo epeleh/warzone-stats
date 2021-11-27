@@ -56,13 +56,6 @@ class MongoDAL {
         return await this.getPlayerFromGuild(guildId, platformId, playerId) != null;
     }
 
-    // helpers
-
-    async getModeIds(mode: GameMode): Promise<Array<string>> {
-        const { modeIds } = await this.db.collection('modes').findOne({ mode });
-        return modeIds;
-    }
-
     // scheduling related
 
     async unschedule(schedule: Schedule) {

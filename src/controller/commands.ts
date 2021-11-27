@@ -39,7 +39,6 @@ export async function postStats(message: Message, args: CommandArgs) {
     players.forEach(async player => {
         await sendPlayerStats(message, player, duration, modeId);
     });
-    
 }
 
 

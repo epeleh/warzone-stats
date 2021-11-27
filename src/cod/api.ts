@@ -3,8 +3,6 @@ import { Duration, GameMode, Player, Platform } from "../common/types";
 import { DAL } from "../dal/mongo-dal";
 import { request } from "../utilities/util";
 
-const modeIds = {};
-
 export async function getPlayerProfile(platformId: Platform, playerId: string): Promise<Player> {
     let url = `https://api.tracker.gg/api/v2/warzone/standard/profile/${platformId}/${encodeURIComponent(playerId)}`;
     let res = await request(url);
@@ -21,9 +19,6 @@ export async function getRecentMatches(player: Player, duration: Duration, mode:
 
     let next = 'null';
 
-    // check if modeIds loaded, else load from db
-    if (!modeIds[mode]) modeIds[mode] = await DAL.getModeIds(mode);
-
     // fetch all matches during specified duration
     while (true) {
 
@@ -38,7 +33,7 @@ export async function getRecentMatches(player: Player, duration: Duration, mode:
         let matches = res.data.matches;
 
         // filter out matches of other types
-        matches = matches.filter(x => modeIds[mode].includes(x.attributes.modeId));
+        matches = matches.filter(x => x.attributes.modeId.startsWith(`${mode}_`));
 
         // filter to only today's matches
         let filteredMatches = matches.filter(x => now.diff(x.metadata.timestamp, duration.unit) < duration.value);
