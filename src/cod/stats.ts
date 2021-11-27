@@ -23,6 +23,30 @@ export async function sendPlayerStats(message: Message, player: Player, duration
     // create a stats embed and send
     const embed = createStatsEmbed(player, playerStats, duration, message.client);
     await reply.edit(embed);
+
+    // check if an author of the message is wz bot and the k/d field is found
+    if (message.author.id === message.client.user.id && embed.fields.some(({ name }) => name === 'K/D')) {
+      const guildMember = (await message.guild.members.fetch()).filter(({ user: { bot } }) => !bot)
+        .find(({ user: { username } }) => username.toLowerCase() === player.discordUsername);
+
+      if (guildMember) {
+        const roleNames = ['0+', '0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0+'];
+
+        // remove old k/d roles
+        guildMember.roles.cache.filter(({ name }) => roleNames.includes(name)).each((role) => guildMember.roles.remove(role));
+
+        // calculate new role name
+        const kd = parseFloat(embed.fields.find(({ name }) => name === 'K/D').value);
+        const newRoleName = roleNames.find((rn) => parseFloat(rn) === Math.floor(kd * 2) / 2);
+
+        // create the role if doesn't exist
+        let newRole = message.guild.roles.cache.find(({ name }) => name === newRoleName);
+        if (!newRole) newRole = await message.guild.roles.create({ data: { name: newRoleName } });
+
+        // add new role
+        guildMember.roles.add(newRole);
+      }
+    }
   } catch (e) {
     await reply.edit(getEmbedTemplate(`${formatPlayername(player, message.client)}`, `Failed to fetch stats.\n${e.message}`, player.avatarUrl));
   }

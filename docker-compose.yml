@@ -5,7 +5,7 @@ services:
     build:
       context: .
     environment:
-      TOKEN: OTEzODYyOTg2NzIzMTI3Mzc2.YaErOg.QXSYKNFuSgleRgMoO-mYi6Zfhjs
+      TOKEN: 123
       MONGO_DBNAME: warzone-stats
       MONGO_URI: 'mongodb://mongo:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false'
     depends_on:
