@@ -1,62 +1,60 @@
-import { Message } from "discord.js";
-import { parseArgs, trimWhitespace } from "../utilities/util";
-import commandMap from "./mapping";
-import { updateAnalyticsSheet } from "../utilities/analytics"
+import { Message } from 'discord.js';
+import { parseArgs, trimWhitespace } from '../utilities/util';
+import commandMap from './mapping';
+import { updateAnalyticsSheet } from '../utilities/analytics';
 
-export default async function(message: Message) {
+export default async function controller(message: Message) {
+  // sanitize the message body
+  message.content = trimWhitespace(message.content).toLowerCase();
 
-    // sanitize the message body
-    message.content = trimWhitespace(message.content).toLowerCase();
+  // extract commandName from message
+  const commandName = message.content.split(' ')[1];
 
-    // extract commandName from message
-    const commandName = message.content.split(' ')[1];
+  // fetch the command from commandMap
+  const command = commandMap.get(commandName);
 
-    // fetch the command from commandMap
-    const command = commandMap.get(commandName);
+  // if command not found, post help and return
+  if (!command) {
+    postHelp(message);
+    return;
+  }
 
-    // if command not found, post help and return
-    if (!command) {
-        postHelp(message);
-        return;
+  if (process.env.ENABLE_ANALYTICS) {
+    await updateAnalyticsSheet(commandName, message.guild.id);
+  }
+
+  // check if command regex matches
+  for (const regex of command.regex) {
+    if (regex.test(message.content)) {
+      try {
+        const { groups } = message.content.match(regex);
+        const args = parseArgs(groups);
+        await command.method(message, args);
+      } catch (e) {
+        await message.reply('An error occurred!');
+        console.error(e);
+      }
+      return;
     }
+  }
 
-    if (process.env.ENABLE_ANALYTICS) {
-        await updateAnalyticsSheet(commandName, message.guild.id);    
-    }
-    
-    // check if command regex matches
-    for (const regex of command.regex) {
-        if (regex.test(message.content)) {
-            try {
-                const { groups } = message.content.match(regex);
-                const args = parseArgs(groups);
-                await command.method(message, args);
-            } catch (e) {
-                await message.reply("An error occurred!");
-                console.error(e);
-            }
-            return;
-        }
-    }
-
-    // command syntax was incorrect, post command syntax
-    await message.reply(`Invalid command syntax! See usage below.\n\`${command.usage}\``);
+  // command syntax was incorrect, post command syntax
+  await message.reply(`Invalid command syntax! See usage below.\n\`${command.usage}\``);
 }
 
 async function postHelp(message: Message) {
+  const str: Array<string> = [];
 
-    const str: Array<string> = [];
+  for (const c of commandMap.values()) {
+    str.push(`${c.help}\n\`${c.usage}\`\n`);
+  }
 
-    for (const c of commandMap.values()) {
-        str.push(`${c.help}\n\`${c.usage}\`\n`);
-    }
+  str.push(...[
+    'Parameters: `<required>`, `[optional]`',
+    'modeId: `br` Battle Royale, `rmbl` Rumble, `plndr` Plunder, `rsg` Resurgence',
+    'platformId: `psn` PlayStation, `xbl` Xbox, `atvi` Activision',
+    'duration: `h` hours, `d` days, `w` weeks, `m` months. Defaults to `24h`.',
+  ]);
 
-    str.push(...[
-        'Parameters: `<required>`, `[optional]`',
-        'modeId: `br` Battle Royale, `rmbl` Rumble, `plndr` Plunder, `rsg` Resurgence',
-        'platformId: `psn` PlayStation, `xbl` Xbox, `atvi` Activision',
-        'duration: `h` hours, `d` days, `w` weeks, `m` months. Defaults to `24h`.'
-    ]);
-    
-    await message.reply('**Warzone Stats Help**\n' + str.join('\n'));
+  await message.reply(`**Warzone Stats Help**\n${str.join('\n')}`);
 }
