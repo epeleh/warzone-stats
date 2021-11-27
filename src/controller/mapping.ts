@@ -23,13 +23,11 @@ export default new Map<string, Command>([
   }],
   ['register', {
     method: commands.registerPlayer,
-    usage: '!wz register <platformId> "<playerId>" "<discordUsername>"',
+    usage: '!wz register <platformId> "<playerId>" @<member>',
     help: 'Register a new player',
     regex: [
-      /^!wz register (?<platformId>psn|xbl|atvi) (?<playerId>[0-9A-Za-z#_-]+) (?<discordUsername>[0-9A-Za-z#_-]+)$/,
-      /^!wz register (?<platformId>psn|xbl|atvi) (?<playerId>[0-9A-Za-z#_-]+) "(?<discordUsername>[0-9A-Za-z#_-]+)"$/,
-      /^!wz register (?<platformId>psn|xbl|atvi) "(?<playerId>[0-9A-Za-z#_\- ]+)" (?<discordUsername>[0-9A-Za-z#_-]+)$/,
-      /^!wz register (?<platformId>psn|xbl|atvi) "(?<playerId>[0-9A-Za-z#_\- ]+)" "(?<discordUsername>[0-9A-Za-z#_-]+)"$/,
+      /^!wz register (?<platformId>psn|xbl|atvi) (?<playerId>[0-9A-Za-z#_-]+) <@!(?<memberId>[0-9]+)>$/,
+      /^!wz register (?<platformId>psn|xbl|atvi) "(?<playerId>[0-9A-Za-z#_\- ]+)" <@!(?<memberId>[0-9]+)>$/,
     ],
   }],
   ['unregister', {

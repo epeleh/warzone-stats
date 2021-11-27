@@ -27,7 +27,7 @@ export async function sendPlayerStats(message: Message, player: Player, duration
     // check if an author of the message is wz bot and the k/d field is found
     if (message.author.id === message.client.user.id && embed.fields.some(({ name }) => name === 'K/D')) {
       const guildMember = message.guild.members.cache.filter(({ user: { bot } }) => !bot)
-        .find(({ user: { username } }) => username.toLowerCase() === player.discordUsername);
+        .find(({ user: { id } }) => id === player.memberId);
 
       if (guildMember) {
         const roleNames = ['0+', '0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0+'];
@@ -49,7 +49,7 @@ export async function sendPlayerStats(message: Message, player: Player, duration
 
           // add new role
           await guildMember.roles.add(newRole);
-          await message.channel.send(`<@${guildMember.user.id}> got new role: <@&${newRole.id}>`);
+          await message.channel.send(`<@!${guildMember.user.id}> got new role: <@&${newRole.id}>`);
         }
       }
     }

@@ -5,7 +5,7 @@ export type Player = {
   playerId: string;
   platformId: Platform;
   avatarUrl?: string;
-  discordUsername?: string;
+  memberId?: string;
 };
 
 export type Guild = {
@@ -29,7 +29,7 @@ export type Command = {
 export type CommandArgs = {
   modeId: GameMode,
   playerId: string,
-  discordUsername: string,
+  memberId: string,
   platformId: Platform,
   duration: Duration,
   cron: string,

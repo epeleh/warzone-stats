@@ -35,7 +35,10 @@ export async function postStats(message: Message, args: CommandArgs) {
   }
 
   if (message.author.id === message.client.user.id) {
-    await Promise.all([message.guild.members.fetch(), message.guild.roles.fetch()]);
+    await Promise.all([
+      message.guild.members.fetch({ user: players.map(({ memberId }) => memberId) }),
+      message.guild.roles.fetch(),
+    ]);
   }
 
   // send stats for each player in the players array
@@ -65,25 +68,21 @@ export async function postPlayers(message: Message, args: CommandArgs) {
 }
 
 export async function registerPlayer(message: Message, args: CommandArgs) {
-  const { playerId, platformId, discordUsername } = args;
+  const { playerId, platformId, memberId } = args;
 
   // check if player exists
   const player = await getPlayerProfile(platformId, playerId);
-  player.discordUsername = discordUsername;
+  player.memberId = memberId;
 
   if (player) {
     // check if player is not already registered
     if (!await DAL.isPlayerRegisteredInGuild(player, message.guild.id)) {
       // check if discord member exists
-      if (
-        (await message.guild.members.fetch())
-          .map(({ user }) => user).filter(({ bot }) => !bot).map(({ username }) => username.toLowerCase())
-          .includes(player.discordUsername)
-      ) {
+      if ((await message.guild.members.fetch(player.memberId))?.user?.bot === false) {
         await DAL.addPlayerToGuild(player, message.guild.id);
         await message.reply(`${formatPlayername(player, message.client)} has been registered!`);
       } else {
-        await message.reply(`Member with username "${discordUsername}" does not exist!`);
+        await message.reply(`Member <@!${player.memberId}> does not exist!`);
       }
     } else {
       await message.reply(`${formatPlayername(player, message.client)} is already registered!`);
