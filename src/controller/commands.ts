@@ -61,7 +61,7 @@ export async function postPlayers(message: Message, args: CommandArgs) {
     return;
   }
 
-  const str = players.map((p) => formatPlayername(p, message.client))
+  const str = players.map((p) => `${formatPlayername(p, message.client)}  - <@!${p.memberId}>`)
     .reduce((s, p) => `${s}\n${p}`);
 
   await message.reply(`Registered players:\n${str}`);
@@ -155,7 +155,7 @@ export async function postTeamSplit(message: Message, args: CommandArgs) {
     if (i % teamSize == 0) {
       str.push(`\nTeam ${Math.floor(i / teamSize) + 1}`);
     }
-    str.push(formatPlayername(players[i], message.client));
+    str.push(`${formatPlayername(players[i], message.client)}  - <@!${players[i].memberId}>`);
   }
 
   await message.reply(str.join('\n'));
