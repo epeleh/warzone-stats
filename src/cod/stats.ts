@@ -26,25 +26,31 @@ export async function sendPlayerStats(message: Message, player: Player, duration
 
     // check if an author of the message is wz bot and the k/d field is found
     if (message.author.id === message.client.user.id && embed.fields.some(({ name }) => name === 'K/D')) {
-      const guildMember = (await message.guild.members.fetch()).filter(({ user: { bot } }) => !bot)
+      const guildMember = message.guild.members.cache.filter(({ user: { bot } }) => !bot)
         .find(({ user: { username } }) => username.toLowerCase() === player.discordUsername);
 
       if (guildMember) {
         const roleNames = ['0+', '0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0+'];
 
-        // remove old k/d roles
-        guildMember.roles.cache.filter(({ name }) => roleNames.includes(name)).each((role) => guildMember.roles.remove(role));
-
         // calculate new role name
         const kd = parseFloat(embed.fields.find(({ name }) => name === 'K/D').value);
         const newRoleName = roleNames.find((rn) => parseFloat(rn) === Math.floor(kd * 2) / 2);
 
-        // create the role if doesn't exist
-        let newRole = message.guild.roles.cache.find(({ name }) => name === newRoleName);
-        if (!newRole) newRole = await message.guild.roles.create({ data: { name: newRoleName } });
+        // skip if the member already has the role
+        if (!guildMember.roles.cache.some(({ name }) => name === newRoleName)) {
+          // remove old k/d roles
+          for (const role of guildMember.roles.cache.filter(({ name }) => roleNames.includes(name))) {
+            await guildMember.roles.remove(role);
+          }
 
-        // add new role
-        guildMember.roles.add(newRole);
+          // create the role if doesn't exist
+          let newRole = message.guild.roles.cache.find(({ name }) => name === newRoleName);
+          if (!newRole) newRole = await message.guild.roles.create({ data: { name: newRoleName } });
+
+          // add new role
+          await guildMember.roles.add(newRole);
+          await message.channel.send(`<@${guildMember.user.id}> got new role: <@&${newRole.id}>`);
+        }
       }
     }
   } catch (e) {

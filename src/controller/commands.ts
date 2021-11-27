@@ -34,6 +34,10 @@ export async function postStats(message: Message, args: CommandArgs) {
     }
   }
 
+  if (message.author.id === message.client.user.id) {
+    await Promise.all([message.guild.members.fetch(), message.guild.roles.fetch()]);
+  }
+
   // send stats for each player in the players array
   players.forEach(async (player) => {
     await sendPlayerStats(message, player, duration, modeId);
