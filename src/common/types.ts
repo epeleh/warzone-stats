@@ -28,6 +28,7 @@ export type Command = {
 export type CommandArgs = {
     modeId: GameMode,
     playerId: string,
+    discordUsername: string,
     platformId: Platform,
     duration: Duration,
     cron: string,

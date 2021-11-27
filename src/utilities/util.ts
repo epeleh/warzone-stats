@@ -63,6 +63,7 @@ export function parseArgs(args): CommandArgs {
   const parsedArgs: CommandArgs = {
     platformId: args.platformId ?? null,
     playerId: args.playerId ?? null,
+    discordUsername: args.discordUsername ?? null,
     modeId: args.modeId ?? null,
     cron: args.cron ?? null,
     duration: args.duration ? parseDuration(args.duration) : parseDuration('24h'),
