@@ -5,6 +5,7 @@ export type Player = {
   playerId: string;
   platformId: Platform;
   avatarUrl?: string;
+  discordUsername?: string;
 };
 
 export type Guild = {

@@ -61,16 +61,26 @@ export async function postPlayers(message: Message, args: CommandArgs) {
 }
 
 export async function registerPlayer(message: Message, args: CommandArgs) {
-  const { playerId, platformId } = args;
+  const { playerId, platformId, discordUsername } = args;
 
   // check if player exists
   const player = await getPlayerProfile(platformId, playerId);
+  player.discordUsername = discordUsername;
 
   if (player) {
     // check if player is not already registered
     if (!await DAL.isPlayerRegisteredInGuild(player, message.guild.id)) {
-      await DAL.addPlayerToGuild(player, message.guild.id);
-      await message.reply(`${formatPlayername(player, message.client)} has been registered!`);
+      // check if discord member exists
+      if (
+        (await message.guild.members.fetch())
+          .map(({ user }) => user).filter(({ bot }) => !bot).map(({ username }) => username.toLowerCase())
+          .includes(player.discordUsername)
+      ) {
+        await DAL.addPlayerToGuild(player, message.guild.id);
+        await message.reply(`${formatPlayername(player, message.client)} has been registered!`);
+      } else {
+        await message.reply(`Member with username "${discordUsername}" does not exist!`);
+      }
     } else {
       await message.reply(`${formatPlayername(player, message.client)} is already registered!`);
     }
